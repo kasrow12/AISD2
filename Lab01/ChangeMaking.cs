@@ -27,7 +27,7 @@ namespace ASD
         public int? NoLimitsDynamic(int amount, int[] coins, out int[] change)
         {
             int[] T = new int[amount + 1];
-            T[0] = 0; // można wydać zero
+            // T[0] = 0; // można wydać zero
             int[] used = new int[amount + 1];  
             
             for (int i = 1; i <= amount; i++)
@@ -35,9 +35,12 @@ namespace ASD
                 int min = int.MaxValue;
                 for (int j = 0; j < coins.Length; j++)
                 {
-                    if (coins[j] > i) continue;
+                    if (coins[j] > i)
+                        continue;
+                    
                     int t = T[i - coins[j]];
-                    if (t == int.MaxValue) continue;
+                    if (t == int.MaxValue)
+                        continue;
 
                     if (t + 1 < min)
                     {
@@ -89,6 +92,8 @@ namespace ASD
         public int? Dynamic(int amount, int[] coins, int[] limits, out int[] change)
         {
             int[,] T = new int[amount + 1, coins.Length];
+            
+            // used będzie miało "ile razy wziąć monetę z tej kolumny"
             int[,] used = new int[amount + 1, coins.Length];
             for (int i = 1; i <= amount; i++)
                 for (int j = 0; j < coins.Length; j++) 
@@ -102,7 +107,7 @@ namespace ASD
             for (int n = 1; n <= limits[0] && n * coins[0] <= amount; n++)
             {
                 T[n * coins[0], 0] = n;
-                used[n * coins[0], 0] = 0;
+                used[n * coins[0], 0] = n;
             }
 
             for (int j = 1; j < coins.Length; j++)
@@ -112,24 +117,19 @@ namespace ASD
                     if (T[i, j - 1] == int.MaxValue)
                         continue;
 
-                    // bez monety
-                    if (T[i, j] == int.MaxValue)
-                    {
-                        T[i, j] = T[i, j - 1];
-                    }
-
                     for (int k = 0; k <= limits[j]; k++)
                     {
-                        if (i + k*coins[j] > amount) break;
-
-                        int t = T[i, j - 1] + k;
-                        if (t <= T[i + k*coins[j], j])
+                        int c = i + k * coins[j];
+                        if (c > amount)
+                            break;
+                        
+                        if (T[i, j - 1] + k < T[c, j])
                         {
-                            T[i + k*coins[j], j] = t;
+                            T[c, j] = T[i, j - 1] + k;
                             if (k > 0)
-                                used[i + k*coins[j], j] = j;
+                                used[c, j] = k;
                             else 
-                                used[i + k*coins[j], j] = -1;
+                                used[c, j] = -1;
                         }
                     }
                 }
@@ -148,13 +148,14 @@ namespace ASD
             int y = coins.Length - 1;
             while (x > 0 && y >= 0)
             {
-                if (used[x, y] >= 0)
+                if (used[x, y] > 0)
                 {
-                    change[used[x, y]]++;
-                    x -= coins[used[x, y]];
+                    change[y] += used[x, y]; // ile monet tego typu
+                    x -= used[x, y] * coins[y]; // cofamy się
+                    y--;                        // i do poprzedniej monety
                 }
                 else
-                    y--;
+                    y--; // bez monety
             }
             
             return res;
