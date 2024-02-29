@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net4.7.1</TargetFramework>
+        <RootNamespace>Labratoria_ASD2_2024</RootNamespace>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <LangVersion>7.0</LangVersion>
+        <Nullable>disable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Reference Include="TestSet">
+            <HintPath>..\TestSet.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
+</Project>
