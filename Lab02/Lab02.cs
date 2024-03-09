@@ -118,8 +118,8 @@ namespace ASD
                     for (int k = 0; k <= moves.Length; k++)
                         T[i, j, k] = int.MaxValue;
 
-            for (int j = 0; j < m; j++)
-                T[n - 1, j, 0] = 0;
+            // for (int j = 0; j < m; j++)
+            T[n - 1, m - 1, 0] = 0;
 
             // Wyszukiwanie w tył
             // Warto zauważyć, że kolejność ruchów nie ma znaczenia
@@ -149,14 +149,22 @@ namespace ASD
                     }
                 }
             }
+            
+            // Czy dostaliśmy się do któregokolwiek z elementów pierwszego wiersza
+            int col = 0;
+            for (int j = 0; j < m; j++)
+            {
+                if (T[0, j, moves.Length] < T[0, col, moves.Length])
+                    col = j;
+            }
 
-            if (T[0, 0, moves.Length] == int.MaxValue)
+            if (T[0, col, moves.Length] == int.MaxValue)
                 return (false, int.MaxValue, null);
 
             // Znajdowanie ścieżki
             var path = new List<(int, int)> { (0, 0) };
             int x1 = 0;
-            int y1 = 0;
+            int y1 = col;
             int k1 = moves.Length;
             while (true)
             {
@@ -174,10 +182,10 @@ namespace ASD
                 x1 += di;
                 y1 += dj;
                 k1--;
-                path.Add((x1, y1));
+                path.Add((x1, y1 - col));
             }
 
-            return (true, T[0, 0, moves.Length], path.ToArray());
+            return (true, T[0, col, moves.Length], path.ToArray());
         }
     }
 }
