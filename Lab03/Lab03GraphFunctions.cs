@@ -64,6 +64,7 @@ public class Lab03GraphFunctions : MarshalByRefObject
             }
         }
 
+        // izolowane wierzchołki
         for (int i = 0; i < g.VertexCount; i++)
         {
             if (vert[i] == 0)
@@ -138,7 +139,7 @@ public class Lab03GraphFunctions : MarshalByRefObject
 
         foreach (var e in g.DFS().SearchAll())
             h.AddEdge(e.From, e.To, 1);
-
+        // można zmodyfikować Kruskala, żeby wychodzić wcześniej = szybciej
         Lab03Kruskal(h, out int mstw);
 
         return mstw == g.EdgeCount;

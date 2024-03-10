@@ -11,7 +11,21 @@ public class Lab03 : MarshalByRefObject
     // (ale pętli, czyli krawędzi o początku i końcu w tym samym wierzchołku, nie dodajemy!).
     public Graph Square(Graph graph)
     {
-        return null;
+        var h = (Graph)graph.Clone();
+
+        for (int v = 0; v < graph.VertexCount; v++)
+        {
+            foreach (int u in graph.OutNeighbors(v))
+            {
+                foreach (int w in graph.OutNeighbors(u))
+                {
+                    if (w != v)
+                        h.AddEdge(v, w);
+                }
+            }
+        }
+
+        return h;
     }
 
     // Część II
@@ -26,8 +40,55 @@ public class Lab03 : MarshalByRefObject
     // Np.dla wierzchołka powstałego z krawedzi <0,1> do tablicy zapisujemy krotke (0, 1) - przyda się w dalszych etapach
     public Graph LineGraph(Graph graph, out (int x, int y)[] names)
     {
-        names = null;
-        return null;
+        names = new (int x, int y)[graph.EdgeCount];
+        var h = new Graph(graph.EdgeCount, graph.Representation);
+        var dict = new Dictionary<(int, int), int>();
+
+        int index = 0;
+        foreach (var e in graph.DFS().SearchAll())
+        {
+            (int f, int t) edge = e.From < e.To ? (e.From, e.To) : (e.To, e.From);
+
+            if (!dict.ContainsKey(edge))
+            {
+                names[index] = edge;
+                dict[edge] = index++;
+            }
+
+            foreach (int v in graph.OutNeighbors(edge.f))
+            {
+                if (v == edge.t)
+                    continue;
+
+                (int f, int t) ee = edge.f < v ? (edge.f, v) : (v, edge.f);
+
+                if (!dict.ContainsKey(ee))
+                {
+                    names[index] = ee;
+                    dict[ee] = index++;
+                }
+
+                h.AddEdge(dict[edge], dict[ee]);
+            }
+
+            foreach (int v in graph.OutNeighbors(edge.t))
+            {
+                if (v == edge.f)
+                    continue;
+
+                (int f, int t) ee = edge.t < v ? (edge.t, v) : (v, edge.t);
+
+                if (!dict.ContainsKey(ee))
+                {
+                    names[index] = ee;
+                    dict[ee] = index++;
+                }
+
+                h.AddEdge(dict[edge], dict[ee]);
+            }
+        }
+
+        return h;
     }
 
     // Część III
@@ -46,8 +107,31 @@ public class Lab03 : MarshalByRefObject
     // a w tablicy colors zapamiętuje kolory poszczególnych wierzchołkow.
     public int VertexColoring(Graph graph, out int[] colors)
     {
-        colors = null;
-        return 0;
+        int usedColors = 0;
+
+        colors = new int[graph.VertexCount];
+        for (int i = 0; i < graph.VertexCount; i++)
+            colors[i] = -1;
+
+        for (int v = 0; v < graph.VertexCount; v++)
+        {
+            var neighbors = new HashSet<int>();
+            foreach (int u in graph.OutNeighbors(v))
+            {
+                if (colors[u] >= 0)
+                    neighbors.Add(colors[u]);
+            }
+
+            int color = 0;
+            while (neighbors.Contains(color))
+                color++;
+
+            colors[v] = color;
+            if (color >= usedColors)
+                usedColors++;
+        }
+
+        return usedColors;
     }
 
     // Funkcja znajduje silne kolorowanie krawędzi danego grafu.
@@ -63,7 +147,18 @@ public class Lab03 : MarshalByRefObject
     // Jak się to ma do silnego kolorowania krawędzi grafu pierwotnego?
     public int StrongEdgeColoring(Graph graph, out Graph<int> coloredGraph)
     {
-        coloredGraph = null;
-        return 0;
+        var h = Square(LineGraph(graph, out (int, int)[] names));
+        int usedColors = VertexColoring(h, out int[] colors);
+
+        coloredGraph = new Graph<int>(graph.VertexCount, graph.Representation);
+
+        for (int i = 0; i < names.Length; i++)
+        {
+            (int u, int v) = names[i];
+            if (graph.HasEdge(u, v))
+                coloredGraph.AddEdge(u, v, colors[i]);
+        }
+
+        return usedColors;
     }
 }
