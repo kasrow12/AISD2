@@ -6,7 +6,6 @@ public class Lab04 : MarshalByRefObject
 {
     private int end;
     private DiGraph g;
-    private DiGraph<int> g2;
     private int[] visited;
 
     /// <summary>
@@ -57,43 +56,42 @@ public class Lab04 : MarshalByRefObject
     /// <returns>Tablica numerow miast ktore mozna odwiedzic. Posortowana rosnaco.</returns>
     public int[] Lab04Stage2(DiGraph<int> graph, int miastoStartowe, int K)
     {
-        end = K;
-        visited = new int[graph.VertexCount];
+        int[] visitedAt = new int[graph.VertexCount];
         for (int i = 0; i < graph.VertexCount; i++)
-            visited[i] = int.MaxValue;
-        g2 = graph;
+            visitedAt[i] = int.MaxValue;
 
         var q = new PriorityQueue<int, (int, int)>();
         q.Insert((miastoStartowe, 8), 8);
 
+        // Dijkstra
         while (q.Count > 0)
         {
-            (int v, int c) = q.Extract();
+            (int v, int hour) = q.Extract();
 
-            if (visited[v] <= c)
+            if (visitedAt[v] <= hour)
                 continue;
 
-            visited[v] = c;
-
-            if (c >= end)
+            visitedAt[v] = hour;
+            if (hour >= K)
                 continue;
 
-            foreach (var e in g2.OutEdges(v))
+            foreach (var e in graph.OutEdges(v))
             {
-                // jeżeli później && + godzina na dojazd && będziemy tam szybciej niż wcześniej
-                if (e.Weight >= c && e.Weight + 1 <= end && visited[e.To] > e.Weight + 1)
-                    q.Insert((e.To, e.Weight + 1), e.Weight + 1);
+                // odjazd później && + godzina na dojazd && będziemy tam szybciej niż wcześniej
+                int arrival = e.Weight + 1;
+                if (hour <= e.Weight && arrival <= K && arrival < visitedAt[e.To])
+                    q.Insert((e.To, arrival), arrival);
             }
         }
 
 
-        var list = new List<int>();
+        var cities = new List<int>();
         for (int i = 0; i < graph.VertexCount; i++)
         {
-            if (visited[i] != int.MaxValue)
-                list.Add(i);
+            if (visitedAt[i] != int.MaxValue)
+                cities.Add(i);
         }
 
-        return list.ToArray();
+        return cities.ToArray();
     }
 }
