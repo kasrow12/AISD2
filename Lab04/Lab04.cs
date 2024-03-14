@@ -63,7 +63,29 @@ public class Lab04 : MarshalByRefObject
             visited[i] = int.MaxValue;
         g2 = graph;
 
-        Dfs2(miastoStartowe, 8);
+        var q = new PriorityQueue<int, (int, int)>();
+        q.Insert((miastoStartowe, 8), 8);
+
+        while (q.Count > 0)
+        {
+            (int v, int c) = q.Extract();
+
+            if (visited[v] <= c)
+                continue;
+
+            visited[v] = c;
+
+            if (c >= end)
+                continue;
+
+            foreach (var e in g2.OutEdges(v))
+            {
+                // jeżeli później && + godzina na dojazd && będziemy tam szybciej niż wcześniej
+                if (e.Weight >= c && e.Weight + 1 <= end && visited[e.To] > e.Weight + 1)
+                    q.Insert((e.To, e.Weight + 1), e.Weight + 1);
+            }
+        }
+
 
         var list = new List<int>();
         for (int i = 0; i < graph.VertexCount; i++)
@@ -73,15 +95,5 @@ public class Lab04 : MarshalByRefObject
         }
 
         return list.ToArray();
-    }
-    
-    private void Dfs2(int v, int h)
-    {
-        visited[v] = h;
-        foreach (var e in g2.OutEdges(v))
-        {
-            if (e.Weight >= h && e.Weight + 1 <= end && visited[e.To] > e.Weight + 1)
-                Dfs2(e.To, e.Weight + 1);
-        }
     }
 }
