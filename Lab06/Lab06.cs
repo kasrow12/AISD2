@@ -34,47 +34,45 @@ namespace ASD
                 visited[i] = -1;
 
             var q = new Queue<int>();
-            // Wrzucenie do kolejki startów we wszystkich kolorach
-            for (int i = 0; i < n; i++)
+            // Wrzucenie do kolejki startu we wszystkich kolorach
+            for (int color = 0; color < n; color++)
             {
-                q.Enqueue(GetI(start, i, n));
-                visited[i] = -2; 
+                int v = GetI(start, color, n);
+                q.Enqueue(v);
+                visited[v] = -2; // oznaczenie startu, do wyznaczania ścieżki
             }
 
             // BFS
             while (q.Count > 0)
             {
-                for (int t = q.Count; t > 0; t--)
+                int i = q.Dequeue();
+                (int v, int color) = GetVC(i, n);
+
+                // Znaleziono trasę
+                if (v == target)
                 {
-                    int i = q.Dequeue();
-                    (int v, int color) = GetVC(i, n);
-
-                    // Znaleziono trasę
-                    if (v == target)
+                    var list = new List<int>();
+                    while (i != -2)
                     {
-                        var list = new List<int>();
-                        while (i != -2)
-                        {
-                            list.Insert(0, i / n);
-                            i = visited[i];
-                        }
-
-                        return (true, list.ToArray());
+                        list.Insert(0, i / n);
+                        i = visited[i];
                     }
 
-                    // Przeszukiwanie możliwych jeszcze nieodwiedzonych miast 
-                    foreach (var e in g.OutEdges(v))
-                    {
-                        int dest = GetI(e.To, e.Weight, n);
-                        if (visited[dest] != -1)
-                            continue;
+                    return (true, list.ToArray());
+                }
 
-                        // Czy zgodny kolor albo możliwa zmiana
-                        if (color == e.Weight || c.HasEdge(color, e.Weight))
-                        {
-                            q.Enqueue(dest);
-                            visited[dest] = i;
-                        }
+                // Przeszukiwanie możliwych jeszcze nieodwiedzonych miast 
+                foreach (var e in g.OutEdges(v))
+                {
+                    int dest = GetI(e.To, e.Weight, n);
+                    if (visited[dest] != -1)
+                        continue;
+
+                    // Czy zgodny kolor albo możliwa zmiana
+                    if (color == e.Weight || c.HasEdge(color, e.Weight))
+                    {
+                        q.Enqueue(dest);
+                        visited[dest] = i;
                     }
                 }
             }
@@ -97,24 +95,25 @@ namespace ASD
         public (int? cost, int[] path) Stage2(int n, DiGraph<int> c, Graph<int> g, int target, int[] starts)
         {
             var graph = new DiGraph<int>(g.VertexCount * n + 2, g.Representation);
-            int start = g.VertexCount * n;
-            int end = g.VertexCount * n + 1;
+            const int defaultCost = 1;
 
-            // Tworzymy graf pomocniczy, w którym wierzchołki są postaci (miasto, bieżący_kolor)
+            // Tworzymy graf pomocniczy, dla wierzchołków postaci (miasto, bieżący_kolor)
             foreach (var e in g.BFS().SearchAll())
             {
                 int from = GetI(e.From, e.Weight, n);
                 int color = e.Weight;
-                graph.AddEdge(from, GetI(e.To, color, n), 1);
+                graph.AddEdge(from, GetI(e.To, color, n), defaultCost);
 
                 // Zmiany kolorów obsługujemy poprzez dodanie dodatkowych krawędzi prowadzących do miasta,
                 // do którego możemy dostać się poprzez jedną zmianę koloru (sąsiedzi w grafie c)
                 foreach (var colorChange in c.OutEdges(color))
-                    graph.AddEdge(from, GetI(e.To, colorChange.To, n), colorChange.Weight + 1);
+                    graph.AddEdge(from, GetI(e.To, colorChange.To, n), colorChange.Weight + defaultCost);
             }
 
             // Tworzymy sztuczny wierzchołek wejściowy, który będzie połączony ze wszystkimi startami we wszystkich
-            // możliwych kolorach oraz wierzchołek końcowy, połączony z końcem w każdym kolorze. 
+            // możliwych kolorach oraz wierzchołek końcowy, połączony z końcem w każdym kolorze (o kosztach 0). 
+            int start = g.VertexCount * n;
+            int end = g.VertexCount * n + 1;
             for (int color = 0; color < n; color++)
             {
                 foreach (int v in starts)
