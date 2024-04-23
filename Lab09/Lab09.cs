@@ -81,21 +81,21 @@ public static class Lab10GraphExtender
         int[] mapping = new int[n];
         bool[] used = new bool[n];
 
-        bool Iso(int k)
+        bool Iso(int vh)
         {
-            if (k == n)
+            if (vh == n)
                 return true;
 
-            for (int m = 0; m < n; m++)
+            for (int vg = 0; vg < n; vg++)
             {
-                if (used[m] || h.OutNeighbors(k).Count() != g.OutNeighbors(m).Count())
+                if (used[vg] || h.OutNeighbors(vh).Count() != g.OutNeighbors(vg).Count())
                     continue;
 
                 bool valid = true;
-                for (int v = 0; v < k; v++)
+                for (int v = 0; v < vh; v++)
                 {
-                    if (g.HasEdge(mapping[v], m) != h.HasEdge(v, k)
-                        || (g.HasEdge(mapping[v], m) && g.GetEdgeWeight(mapping[v], m) != h.GetEdgeWeight(v, k)))
+                    if (g.HasEdge(mapping[v], vg) != h.HasEdge(v, vh)
+                        || (g.HasEdge(mapping[v], vg) && g.GetEdgeWeight(mapping[v], vg) != h.GetEdgeWeight(v, vh)))
                     {
                         valid = false;
                         break;
@@ -105,13 +105,13 @@ public static class Lab10GraphExtender
                 if (!valid)
                     continue;
 
-                used[m] = true;
-                mapping[k] = m;
+                used[vg] = true;
+                mapping[vh] = vg;
 
-                if (Iso(k + 1))
+                if (Iso(vh + 1))
                     return true;
 
-                used[m] = false;
+                used[vg] = false;
             }
 
             return false;
