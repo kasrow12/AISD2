@@ -22,33 +22,34 @@ public class DeliveryPlanner : MarshalByRefObject
         List<int> S = [0];
         int curEggs = truckCapacity;
         int curSteam = tankEngineRange;
-        // int curCost = 0;
+        int curTime = 0;
         List<int> bestS = [];
-        // int bestSum = int.MinValue;
-        // int bestCost = int.MaxValue;
+        int bestTime = int.MaxValue;
+
+        bool possible = false;
 
         bool[] delivered = new bool[n];
         int ndelivered = 0;
 
-        bool FindPath(int last)
+        void FindPath(int last)
         {
-            if (ndelivered == n - 1 && last == 0)
+            if (last == 0 && ndelivered == n - 1)
             {
-                // if (curCost < bestCost)
-                // {
+                if (curTime < bestTime)
+                {
                     bestS = S[..];
-                    // bestCost = curCost;
-                    // bestSum = curSum;
-                // }
-                // else
-                // {
-                    return true;
-                // }
+                    bestTime = curTime;
+                }
+
+                possible = true;
+                return;
             }
 
             foreach (var e in railway.OutEdges(last))
             {
-                if (delivered[e.To] || curSteam - e.Weight < 0 || curEggs < eggDemand[e.To])
+                if (delivered[e.To] || curTime + e.Weight > bestTime // czy mieścimy się w lepszym czasie
+                                    || curSteam < e.Weight // czy starczy zasięgu parowozu
+                                    || curEggs < eggDemand[e.To]) // każda stacja tylko raz -> trzeba rozwieźć od razu
                     continue;
 
                 S.Add(e.To);
@@ -58,19 +59,23 @@ public class DeliveryPlanner : MarshalByRefObject
                     ndelivered++;
                 }
 
+                curTime += e.Weight;
+
                 int lastSteam = curSteam;
-                int lastEggs = curEggs;
-                
-                curSteam -= e.Weight;
                 if (isRefuelStation[e.To])
                     curSteam = tankEngineRange;
-                
-                curEggs -= eggDemand[last];
+                else
+                    curSteam -= e.Weight;
+
+                int lastEggs = curEggs;
                 if (e.To == 0)
                     curEggs = truckCapacity;
+                else
+                    curEggs -= eggDemand[e.To];
 
-                if (FindPath(e.To))
-                    return true;
+                FindPath(e.To);
+                if (possible && anySolution)
+                    return;
 
                 if (e.To != 0)
                 {
@@ -78,18 +83,15 @@ public class DeliveryPlanner : MarshalByRefObject
                     ndelivered--;
                 }
 
+                curTime -= e.Weight;
                 curSteam = lastSteam;
                 curEggs = lastEggs;
-                
-                S.RemoveAt(S.Count - 1); // remove last                
+                S.RemoveAt(S.Count - 1);
             }
-
-            return false;
         }
 
-        bool ret = FindPath(0);
-        
-        // Console.WriteLine(String.Join(',', bestS));
-        return (ret, bestS.ToArray());
+        FindPath(0);
+
+        return (possible, bestS.ToArray());
     }
 }
