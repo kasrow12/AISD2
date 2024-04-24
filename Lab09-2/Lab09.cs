@@ -53,7 +53,6 @@ public class Lab08 : MarshalByRefObject
 
         void MaxCampaign(int last)
         {
-            // Console.WriteLine(String.Join(',', S));
             if (used[capitalCity] && capitalCity == last)
             {
                 if (curSum > bestSum

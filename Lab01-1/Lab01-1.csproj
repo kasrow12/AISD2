@@ -5,15 +5,13 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <RootNamespace>Lab01</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-        <Reference Include="Graphs">
-            <HintPath>..\Graphs.dll</HintPath>
-        </Reference>
-        <Reference Include="TestSet">
-            <HintPath>..\TestSet.dll</HintPath>
-        </Reference>
+      <Reference Include="TestSet">
+        <HintPath>..\..\..\Downloads\TestSet.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>
