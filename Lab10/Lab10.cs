@@ -9,17 +9,19 @@ namespace ASD
         /// <param name="labyrinth">Graf reprezentujący labirynt</param>
         /// <param name="startingTorches">Ilość pochodni z jaką startują bohaterowie</param>
         /// <param name="roomTorches">Ilość pochodni w poszczególnych pokojach</param>
-        /// <param name="debt>">Ilość złota jaką bohaterowie muszą zebrać</param>
+        /// <param name="debt">Ilość złota jaką bohaterowie muszą zebrać</param>
         /// <param name="roomGold">Ilość złota w poszczególnych pokojach</param>
         /// <returns>
-        ///     Informację czy istnieje droga przez labirytn oraz tablicę reprezentującą kolejne wierzchołki na drodze. W
-        ///     przypadku, gdy zwracany jest false, wartość tego pola powinna być null.
+        ///     Informację czy istnieje droga przez labirynt oraz tablicę reprezentującą kolejne wierzchołki na drodze.
+        ///     W przypadku, gdy zwracany jest false, wartość tego pola powinna być null.
         /// </returns>
-        public (bool routeExists, int[] route) FindEscape(Graph labyrinth, int startingTorches, int[] roomTorches, int debt,
-            int[] roomGold)
+        public (bool routeExists, int[] route) FindEscape(Graph labyrinth, int startingTorches, int[] roomTorches,
+            int debt, int[] roomGold)
         {
             int n = labyrinth.VertexCount;
-            var S = new List<int>() { 0 };
+
+            // Wartości początkowe
+            var S = new List<int> { 0 };
             int curTorches = startingTorches + roomTorches[0];
             int curDebt = debt - roomGold[0];
 
@@ -29,33 +31,27 @@ namespace ASD
             bool FindPath(int last)
             {
                 if (last == n - 1)
-                {
-                    if (curDebt > 0)
-                        return false;
-                
-                    return true;
-                }
+                    return curDebt <= 0;
 
                 if (curTorches == 0)
                     return false;
 
                 foreach (int u in labyrinth.OutNeighbors(last))
                 {
-                    if (visited[u]) 
+                    // W tym etapie możemy wejść do każdego wierzchołka tylko raz
+                    if (visited[u])
                         continue;
 
                     S.Add(u);
                     visited[u] = true;
-                    curTorches--;
-                    curTorches += roomTorches[u];
+                    curTorches += roomTorches[u] - 1;
                     curDebt -= roomGold[u];
 
                     if (FindPath(u))
                         return true;
 
                     visited[u] = false;
-                    curTorches -= roomTorches[u];
-                    curTorches++;
+                    curTorches -= roomTorches[u] - 1; // -(-1) = +1
                     curDebt += roomGold[u];
                     S.RemoveAt(S.Count - 1);
                 }
@@ -63,11 +59,8 @@ namespace ASD
                 return false;
             }
 
-            bool ret = FindPath(0);
-            if (!ret)
-                return (false, null);
-
-            return (true, S.ToArray());
+            bool routeExists = FindPath(0);
+            return (routeExists, routeExists ? S.ToArray() : null);
         }
 
         /// <param name="labyrinth">Graf reprezentujący labirynt</param>
@@ -77,90 +70,99 @@ namespace ASD
         /// <param name="roomGold">Ilość złota w poszczególnych pokojach</param>
         /// <param name="dragonDelay">Opóźnienie z jakim wystartuje smok</param>
         /// <returns>
-        ///     Informację czy istnieje droga przez labirynt oraz tablicę reprezentującą kolejne wierzchołki na drodze. W
-        ///     przypadku, gdy zwracany jest false, wartość tego pola powinna być null.
+        ///     Informację czy istnieje droga przez labirynt oraz tablicę reprezentującą kolejne wierzchołki na drodze.
+        ///     W przypadku, gdy zwracany jest false, wartość tego pola powinna być null.
         /// </returns>
         public (bool routeExists, int[] route) FindEscapeWithHeadstart(Graph labyrinth, int startingTorches,
             int[] roomTorches, int debt, int[] roomGold, int dragonDelay)
         {
-        
             int n = labyrinth.VertexCount;
-            var S = new List<int>() { 0 };
-            int curTorches = startingTorches + roomTorches[0];
-            int curDebt = debt - roomGold[0];
 
-            int[] visited = new int[n];
-            bool[] usedTorches = new bool[n];
-            visited[0] = 0;
-            int curTime = 0;
-            usedTorches[0] = true;
+            // Wartości początkowe
+            var S = new List<int> { 0 };
+            int destTime = 1; // Zaczniemy od 1, żeby domyślne 0 było jako nieodwiedzone
+            int curDebt = debt - roomGold[0];
+            int curTorches = startingTorches + roomTorches[0];
+
+            // (czas w którym odwiedzono wierzchołek, dług wtedy, liczba pochodni wtedy)
+            var visited = new (int, int, int)[n]; // domyślnie (0, 0, 0)
+            visited[0] = (destTime, curDebt, curTorches);
 
             bool FindPath(int last)
             {
                 if (last == n - 1)
-                {
-                    if (curDebt > 0)
-                        return false;
-                
-                    return true;
-                }
+                    return curDebt <= 0;
 
                 if (curTorches == 0)
                     return false;
 
+                destTime++;
+                curTorches--;
+
                 foreach (int u in labyrinth.OutNeighbors(last))
                 {
-                    bool changed = false;
-                    if (visited[u] > 0)
+                    (int visitedAt, int debtThen, int torchesThen) = visited[u];
+                    int lastDelay = dragonDelay;
+                    int lastDestTime = destTime;
+
+                    // Czy już tutaj byliśmy
+                    if (visitedAt > 0)
                     {
-                        if (curTime - visited[u] >= dragonDelay)
+                        // Smok może iść tylko po naszych śladach, nie znajdzie ścieżki złożonej z innych krawędzi.
+                        // Zatem może nas dogonić tylko pomijając cykle.
+                        // Sprawdzamy, czy ta różnica jest większa od delay'a, w takim przypadku znaczy to, że smok
+                        // zdążył dostać się do tamtego wierzchołka i go zniszczyć (delay będzie się zmniejszał
+                        // o te zamykane cykle). (nierówność ostra, bo smok jeszcze traci jeden ruch na początku)
+                        if (destTime - visitedAt > dragonDelay)
                             continue;
-                        changed = true;
-                        dragonDelay -= curTime - visited[u];
+
+                        // Nie ma sensu wchodzić z powrotem, jeżeli nie zebraliśmy więcej złota
+                        // i nie zdobyliśmy dodatkowych pochodni. (Eliminujemy zbędne kręcenie się w kółko)
+                        if (curDebt >= debtThen && curTorches <= torchesThen)
+                            continue;
+
+                        // Pomniejszamy delay o różnicę czasu i czasu wejścia, bo w tym momencie zrobiliśmy jakiś cykl,
+                        // którego długość jest tą różnicą.
+                        dragonDelay -= destTime - visitedAt;
+                        // W tym przypadku też trzeba zmniejszyć destTime o długość tego cyklu (ustawić go na visitedAt),
+                        // bo zamykając ten cykl, zmniejszyliśmy wyżej dragonDelay i jakby zapomniamy o nim. 
+                        destTime = visitedAt;
                     }
 
                     S.Add(u);
-                    int lastVisited = visited[u];
-                    visited[u] = curTime;
-                    curTorches--;
-                    bool used = false;
-                    if (!usedTorches[u])
+
+                    // Zbieramy przedmioty, jeżeli jesteśmy tutaj za pierwszym razem
+                    if (visitedAt == 0)
                     {
-                        used = true;
-                        curTorches += roomTorches[u];
-                        usedTorches[u] = true;
                         curDebt -= roomGold[u];
+                        curTorches += roomTorches[u];
                     }
-                    curTime++;
+
+                    visited[u] = (destTime, curDebt, curTorches);
 
                     if (FindPath(u))
                         return true;
-
-                    curTime--;
-                    visited[u] = lastVisited;
-                    if (used)
+                    
+                    if (visitedAt == 0)
                     {
+                        curDebt += roomGold[u];
                         curTorches -= roomTorches[u];
-                        usedTorches[u] = false;
-                        curDebt += roomGold[u]; 
                     }
-                    curTorches++;
-                    if (changed)
-                        dragonDelay += curTime - visited[u];
-                
+
+                    visited[u] = (visitedAt, debtThen, torchesThen);
+
+                    dragonDelay = lastDelay;
+                    destTime = lastDestTime;
                     S.RemoveAt(S.Count - 1);
                 }
 
+                destTime--;
+                curTorches++;
                 return false;
             }
 
-            bool ret = FindPath(0);
-            if (!ret)
-                return (false, null);
-
-            // Console.WriteLine(String.Join(',', S));
-
-            return (true, S.ToArray());
+            bool routeExists = FindPath(0);
+            return (routeExists, routeExists ? S.ToArray() : null);
         }
     }
 }
