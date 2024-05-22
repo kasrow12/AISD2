@@ -79,7 +79,6 @@ namespace ASD
                         right--;
                     }
                 }
-
             }
             
             return water;
@@ -92,18 +91,51 @@ namespace ASD
         /// </summary>
         public double WaterVolume(Point[] points)
         {
-            return 0;
-        }
-        
-        // iloczyn wektorowy
-        private double Cross((double, double) o, (double, double) a, (double, double) b)
-        {
-            double value = (a.Item1 - o.Item1) * (b.Item2 - o.Item2) - (a.Item2 - o.Item2) * (b.Item1 - o.Item1);
-            return Math.Abs(value);
-        }
+            int left = 0;
+            int right = points.Length - 1;
+            double[] water = new double[points.Length];
 
+            double area = 0;
+            while (true)
+            {
+                while (left < right && points[left].y < points[left + 1].y) left++;
+                while (left < right && points[right - 1].y > points[right].y) right--;
+
+                if (left >= right) break;
+
+                double min;
+                if (points[left].y < points[right].y)
+                {
+                    min = points[left++].y;
+                    while (left < right && points[left].y < min)
+                    {
+                        water[left] = min - points[left].y;
+                        area += (water[left - 1] + water[left]) * (points[left].x - points[left - 1].x) / 2;
+                        left++;
+                    }
+
+                    var p = getPointAtY(points[left - 1], points[left], min);
+                    area += water[left - 1] * (p.x - points[left - 1].x) / 2;
+                }
+                else
+                {
+                    min = points[right--].y;
+                    while (left < right && points[right].y < min)
+                    {
+                        water[right] = min - points[right].y;
+                        area += (water[right + 1] + water[right]) * (points[right + 1].x - points[right].x) / 2;
+                        right--;
+                    }
+
+                    var p = getPointAtY(points[right], points[right + 1], min);
+                    area += water[right + 1] * (points[right + 1].x - p.x) / 2;
+                }
+            }
+
+
+            return area;
+        }
     }
-    
 
     [Serializable]
     public struct Point
