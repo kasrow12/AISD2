@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-
 namespace ASD
 {
     public class WaterCalculator : MarshalByRefObject
     {
-
         /*
          * Metoda sprawdza, czy przechodząc p1->p2->p3 skręcamy w lewo 
          * (jeżeli idziemy prosto, zwracany jest fałsz).
@@ -46,42 +44,80 @@ namespace ASD
         /// 
         /// Przyjmujemy, że pierwszy punkt z tablicy points jest lewym krańcem, a ostatni - prawym krańcem łańcucha górskiego.
         /// </summary>
-        ///
         public double[] PointDepths(Point[] points)
         {
+            // Tym razem trochę może być trochę brzydszy kod, zabrakło czasu na upiększanie
             int left = 0;
-            int right = points.Length - 1;
             double[] water = new double[points.Length];
-            
+
             while (true)
             {
+                // Szukamy nie malejącego podciągu x'ów, aby wykorzystać rozwiązanie z części A, w której to było założeniem 
+                int right = left;
+                while (right + 1 < points.Length && points[right].x <= points[right + 1].x)
+                    right++;
+
+                if (left >= right)
+                    break;
+
+                CalculateWater(points, left, right, water);
+
+                // Skipujemy ten podciąg oraz idziemy do następnego (o ile istnieje)
+                left = right + 1;
+                while (left + 1 < points.Length && points[left].x > points[left + 1].x)
+                    left++;
+            }
+
+            return water;
+        }
+
+
+        public double CalculateWater(Point[] points, int left, int right, double[] water)
+        {
+            double area = 0;
+            // Zamiatanie z obu stron, woda będzie sięgać mniejszego boku. Później przechodzimy do pozostałej części
+            // i ponownie sprawdzamy podproblemy.
+            while (true)
+            {
+                // Skip ścianek/krawędzi z boków
                 while (left < right && points[left].y < points[left + 1].y) left++;
                 while (left < right && points[right - 1].y > points[right].y) right--;
-                
+
                 if (left >= right) break;
 
                 double min;
+                // Woda "zatrzymuje się na lewej krawędzi"
                 if (points[left].y < points[right].y)
                 {
                     min = points[left++].y;
                     while (left < right && points[left].y < min)
                     {
                         water[left] = min - points[left].y;
+                        // Pole wody liczymy jako sumę trapezów (bądź trójkątów, gdy któreś water[]=0) o wysokościach deltaX
+                        area += (water[left - 1] + water[left]) * (points[left].x - points[left - 1].x) / 2;
                         left++;
                     }
+
+                    // Minimum było z lewej, teraz zostaje nam punkt przecięcia z prawej (trójkąt)
+                    var intersect = getPointAtY(points[left - 1], points[left], min);
+                    area += water[left - 1] * (intersect.x - points[left - 1].x) / 2;
                 }
-                else
+                else // analogicznie, gdy minimum z prawej -> idziemy do lewej
                 {
                     min = points[right--].y;
                     while (left < right && points[right].y < min)
                     {
                         water[right] = min - points[right].y;
+                        area += (water[right + 1] + water[right]) * (points[right + 1].x - points[right].x) / 2;
                         right--;
                     }
+
+                    var intersect = getPointAtY(points[right], points[right + 1], min);
+                    area += water[right + 1] * (points[right + 1].x - intersect.x) / 2;
                 }
             }
-            
-            return water;
+
+            return area;
         }
 
         /// <summary>
@@ -92,46 +128,25 @@ namespace ASD
         public double WaterVolume(Point[] points)
         {
             int left = 0;
-            int right = points.Length - 1;
             double[] water = new double[points.Length];
-
             double area = 0;
+
+            // Analogicznie do tamtego etapu, szukamy nie malejących po x podciągów
             while (true)
             {
-                while (left < right && points[left].y < points[left + 1].y) left++;
-                while (left < right && points[right - 1].y > points[right].y) right--;
+                int right = left;
+                while (right + 1 < points.Length && points[right].x <= points[right + 1].x)
+                    right++;
 
-                if (left >= right) break;
+                if (left >= right)
+                    break;
 
-                double min;
-                if (points[left].y < points[right].y)
-                {
-                    min = points[left++].y;
-                    while (left < right && points[left].y < min)
-                    {
-                        water[left] = min - points[left].y;
-                        area += (water[left - 1] + water[left]) * (points[left].x - points[left - 1].x) / 2;
-                        left++;
-                    }
+                area += CalculateWater(points, left, right, water);
 
-                    var p = getPointAtY(points[left - 1], points[left], min);
-                    area += water[left - 1] * (p.x - points[left - 1].x) / 2;
-                }
-                else
-                {
-                    min = points[right--].y;
-                    while (left < right && points[right].y < min)
-                    {
-                        water[right] = min - points[right].y;
-                        area += (water[right + 1] + water[right]) * (points[right + 1].x - points[right].x) / 2;
-                        right--;
-                    }
-
-                    var p = getPointAtY(points[right], points[right + 1], min);
-                    area += water[right + 1] * (points[right + 1].x - p.x) / 2;
-                }
+                left = right + 1;
+                while (left + 1 < points.Length && points[left].x > points[left + 1].x)
+                    left++;
             }
-
 
             return area;
         }
