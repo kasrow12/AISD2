@@ -34,3 +34,10 @@
 | ➕ | Lab09-2 | Algorytmy wykładnicze | Odwiedzanie miast | brak 2. etapu |
 | ✔ | Lab10-2022 | Algorytmy wykładnicze | Parowóz z jajkami | |
 | ✔ | **Lab10** | **Algorytmy wykładnicze** | **Labirynt z przedmiotami** | | 
+| ➕ | Lab11-1 | Geometria | Otoczka wypukła | brak 2. etapu |
+| ✔ | **Lab12** | **Geometria** | **Głębokość wody** | |
+| ➕ | Lab13-1 | Algorytmy tekstowe | Potęgi słów | ogarnąć |
+| ✔ | **Lab14** | **Algorytmy tekstowe** | **** | |
+
+
+
