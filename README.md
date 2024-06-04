@@ -36,6 +36,6 @@
 | ✔ | [**Lab10**](../master/Lab10/) | **Algorytmy wykładnicze** | **Labirynt z przedmiotami** | | 
 | ➕ | [Lab11-1](../master/Lab11-1/) | Geometria | Otoczka wypukła | brak 2. etapu |
 | ✔ | [**Lab12**](../master/Lab12/) | **Geometria** | **Głębokość wody** | |
-| ➕ | [Lab13-1](../master/Lab13-1/) | Algorytmy tekstowe | Potęgi słów | ogarnąć |
+| ✔ | [Lab13-1](../master/Lab13-1/) | Algorytmy tekstowe | Potęgi słów | |
 | ✔ | [**Lab14**](../master/Lab14/) | **Algorytmy tekstowe** | **** | |
 | ✔ | [**Lab15**](../master/Lab15/) | **Zadanie dowolne** | **Kolorowanie grafów** | |
