@@ -30,7 +30,7 @@ namespace ASD2
             }
             
             int[] vertices = Enumerable.Range(0, n).ToArray();
-            Array.Sort(vertices, (v1, v2) => g.OutNeighbors(v1).Count().CompareTo(g.OutNeighbors(v2).Count()));
+            Array.Sort(vertices, (v1, v2) => g.OutNeighbors(vertices[v1]).Count().CompareTo(g.OutNeighbors(vertices[v2]).Count()));
             
             bool ColorGraph(int i)
             {
@@ -59,9 +59,20 @@ namespace ASD2
                 return false;
             }
 
-            while (!ColorGraph(0) && colors <= n)
+            bool ColorAll()
             {
-                Console.WriteLine(colors);
+                for (int v = 0; v < n; v++)
+                {
+                    if (coloring[v] == 0)
+                        if (!ColorGraph(v))
+                            return false;
+                }
+
+                return true;
+            }
+
+            while (!ColorAll())
+            {
                 colors++;
             }
             
