@@ -14,7 +14,7 @@ namespace Lab15
         /// <returns></returns>
         static public int Period(this string s)
         {
-            return s.Length - ComputePrefix(s)[s.Length - 1];
+            return s.Length - ComputePrefix(s)[s.Length];
         }
 
         /// <summary>
@@ -29,31 +29,10 @@ namespace Lab15
         /// <param name="startIndex">Pierwszy indeks fragmentu zawierającego znalezioną potęgę</param>
         /// <param name="endIndex">Pierwszy indeks po fragmencie zawierającym znalezioną potęgę</param>
         /// <returns></returns>
-        static int[] makeP(string s)
-        {
-            int[] P = new int[s.Length + 1];
-            int t = 0;
-
-            for(int i=2;i<=s.Length;i++)
-            {
-                while (s[t] != s[i-1] && t > 0)
-                    t = P[t];
-                P[i] = t;
-                if (s[i - 1] == s[t])
-                    P[i] = ++t;
-            }
-            return P;
-        }
         static public int MaxPower(this string s, out int startIndex, out int endIndex)
         {
-            if (s == null || s.Length == 0)
-            {
-                startIndex = endIndex = 0;
-                return 0;
-            }
-            
             startIndex = 0;
-            endIndex = 1;
+            endIndex = 0;
             int maxPow = 1;
             int n = s.Length;
             
@@ -62,9 +41,11 @@ namespace Lab15
                 int[] prefix = ComputePrefix(s[i..]);
                 for (int j = 2; j <= n - i; j++)
                 {
-                    if (j % (j - prefix[j - 1]) == 0 && j / (j - prefix[j - 1]) > maxPow)
+                    // czy długość jest podzielna przez okres
+                    int period = (j - prefix[j]);
+                    if (j % period == 0 && j / period > maxPow)
                     {
-                        maxPow = j / (j - prefix[j - 1]);
+                        maxPow = j / period;
                         startIndex = i;
                         endIndex = i + j;
                     }
@@ -73,74 +54,42 @@ namespace Lab15
 
             return maxPow;
         }
-
-
-        public static int[] ComputePrefix(string pattern)
+        
+        static public int[] ComputePrefix(string pattern)
         {
-            int length = 0;
-            int i = 1;
-            int[] lps = new int[pattern.Length];
-            lps[0] = 0;
-
-            while (i < pattern.Length)
+            // zwraca dł. n + 1 !
+            int[] preifx = new int[pattern.Length + 1];
+            int k = 0;
+            for (int q = 2; q <= pattern.Length; q++)
             {
-                if (pattern[i] == pattern[length])
-                {
-                    length++;
-                    lps[i] = length;
-                    i++;
-                }
-                else
-                {
-                    if (length != 0)
-                    {
-                        length = lps[length - 1];
-                    }
-                    else
-                    {
-                        lps[i] = 0;
-                        i++;
-                    }
-                }
+                while (k > 0 && pattern[k] != pattern[q - 1])
+                    k = preifx[k];
+        
+                if (pattern[k] == pattern[q - 1])
+                    k++;
+        
+                preifx[q] = k;
             }
-            return lps;
+        
+            return preifx;
         }
         
-        // static public int[] ComputePrefix(string pattern)
-        // {
-        //     int[] preifx = new int[pattern.Length + 1];
-        //     int k = 0;
-        //     for (int q = 2; q < pattern.Length; q++)
-        //     {
-        //         while (k > 0 && pattern[k + 1] != pattern[q])
-        //             k = preifx[k];
-        //
-        //         if (pattern[k + 1] == pattern[q])
-        //             k++;
-        //
-        //         preifx[q] = k;
-        //     }
-        //
-        //     return preifx[1..];
-        // }
-        
-        static public bool KMP(string pattern, string text)
+        // unused
+        static public List<int> KMP(string pattern, string text)
         {
+            var list = new List<int>();
             int[] prefix = ComputePrefix(pattern);
-            int q = 0;
-            for (int i = 1; i < pattern.Length; i++)
+            for (int i = 0, j = 0; i <= text.Length - pattern.Length; i += Math.Max(j - prefix[j], 1))
             {
-                while (q > 0 && pattern[q + 1] != text[i])
-                    q = prefix[q];
+                j = prefix[j];
+                while (j < pattern.Length && pattern[j] == text[i + j])
+                    j++;
                 
-                if (pattern[q + 1] == text[i])
-                    q++;
-                
-                if (q == pattern.Length)
-                    return true;
+                if (j == pattern.Length)
+                    list.Add(i);
             }
 
-            return false;
+            return list;
         }
     }
 }

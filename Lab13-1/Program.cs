@@ -122,9 +122,11 @@ namespace Lab15
 
         static void Main(string[] args)
         {
-            // Console.WriteLine(stringExtender.KMP("abc", "abcababab"));
+            // Console.WriteLine(stringExtender.KMP("abc", "abcababab").Count);
+            // Console.WriteLine(stringExtender.KMP("abc", "abcababcab").Count);
+            // Console.WriteLine(stringExtender.KMP("abc", "abcabcababc").Count);
+            // Console.WriteLine(stringExtender.KMP("abc", "abcababababababababababbabcbabbcbacabab").Count);
             // var x = stringExtender.ComputePrefix("ababacabab");
-            
             
             // Console.WriteLine("Okres slowa - male testy");
             TestSet smallPeriod = new TestSet(null, "Okres slowa - male testy");
