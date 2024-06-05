@@ -29,33 +29,70 @@ namespace ASD2
                 return true;
             }
             
-            int[] vertices = Enumerable.Range(0, n).ToArray();
-            Array.Sort(vertices, (v1, v2) => g.OutNeighbors(vertices[v1]).Count().CompareTo(g.OutNeighbors(vertices[v2]).Count()));
-            
+            // int[] vertices = Enumerable.Range(0, n).ToArray();
+            // Array.Sort(vertices, (v1, v2) => g.OutNeighbors(vertices[v1]).Count().CompareTo(g.OutNeighbors(vertices[v2]).Count()));
+
+            int[] avail = new int[n];
+            for (int i = 0; i < n; i++)
+                avail[i] = colors;
+
+            int FindMin()
+            {
+                int umin = -1;
+                int availmin = int.MaxValue;
+                for (int i = 0; i < n; i++)
+                {
+                    if (coloring[i] == 0 && avail[i] < availmin)
+                    {
+                        umin = i;
+                        availmin = avail[umin];
+                    }
+                }
+
+                return umin;
+            }
+
+            bool[,] used = new bool[n, colors + 1];
             bool ColorGraph(int i)
             {
-                // Base case: If all vertices are assigned a color then return true
-                if (i == n)
+                if (i == -1)
                     return true;
-
+                
                 // Consider this vertex v and try different colors
                 for (int c = 1; c <= colors; c++)
                 {
                     // Check if assignment of color c to v is fine
-                    if (IsSafe(vertices[i], c))
+                    // if (IsSafe(vertices[i], c))
+                    if (!used[i, c])
                     {
-                        coloring[vertices[i]] = c;
+                        List<int> changed = new List<int>();
+                        
+                        coloring[i] = c;
+                        used[i, c] = true;
+                        foreach (int u in g.OutNeighbors(i))
+                        {
+                            if (!used[u, c])
+                            {
+                                changed.Add(u);
+                                used[u, c] = true;
+                                avail[u]--;
+                            }
+                        }
 
                         // Recur to assign colors to the rest of the vertices
-                        if (ColorGraph(i + 1))
+                        if (ColorGraph(FindMin()))
                             return true;
 
-                        // If assigning color c doesn't lead to a solution then remove it (backtrack)
-                        coloring[vertices[i]] = 0;
+                        foreach (int u in changed)
+                        {
+                            used[u, c] = false;
+                            avail[u]++;
+                        }
+                        used[i, c] = false;
+                        coloring[i] = 0;
                     }
                 }
 
-                // If no color can be assigned to this vertex then return false
                 return false;
             }
 
@@ -74,6 +111,11 @@ namespace ASD2
             while (!ColorAll())
             {
                 colors++;
+                for (int i = 0; i < n; i++)
+                    avail[i] = colors;
+
+                // Console.WriteLine(colors);
+                used = new bool[n, colors + 1];
             }
             
             return (colors, coloring);
