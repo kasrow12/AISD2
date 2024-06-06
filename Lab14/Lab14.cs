@@ -23,37 +23,37 @@ namespace Labratoria_ASD2_2024
         public (int startIndex, int length)[] FindPalindromes(string text)
         {
             var result = new List<(int, int)>();
-            string myText = '#' + text + '$';
-            // string myText = "#";
-            //
-            // foreach (char c in text)
-            // {
-            //     myText += c + "#";
-            // }
-            // Console.WriteLine(myText);
-            //
+            string myText = "#";
+            
+            foreach (char c in text)
+                myText += c + "#";
+
+            // string myText = "##" + String.Join("#", text.ToArray()) + "#$";
+            myText = "#" + myText + "$";
+
             int[] R = new int[myText.Length];
             int left = 2;
             int right = 2;
-            for (int i = 2; i < myText.Length - 1; i++)
+            for (int i = 2; i < myText.Length - 2; i++)
             {
-                R[i] = Math.Min(right - i, R[left + (right - i)]);
-                if (R[i] < 0)
-                    R[i] = 0;
+                // czy wewnątrz jakiegoś palindroma
+                if (i < right)
+                    R[i] = Math.Min(right - i, R[left + (right - i)]);
                 
                 // rozszerzanie
                 while (myText[i - R[i] - 1] == myText[i + R[i] + 1])
                     R[i]++;
 
-                if (R[i] >= right - i)
+                // powiększony z prawej, albo nowy palindrom
+                if (i + R[i] > right)
                 {
                     left = i - R[i];
                     right = i + R[i];
                 }
 
-                int d = 2 * R[i] + 1;
-                if (d > 1)
-                    result.Add((i - R[i] - 1, d));
+                // int d = R[i]; // (2 * R[i] + 1) / 2;
+                if (R[i] > 1)
+                    result.Add(((i - R[i] - 1) / 2, R[i]));
             }
             
             return result.ToArray();
