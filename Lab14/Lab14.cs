@@ -23,37 +23,55 @@ namespace Labratoria_ASD2_2024
         public (int startIndex, int length)[] FindPalindromes(string text)
         {
             var result = new List<(int, int)>();
-            string myText = "#";
+            string myText = "#" + text + "$";
+            int[,] R = new int[2, myText.Length];
+
+            int left = 1;
+            int right = 1;
+            // parzyste
+            for (int i = 1; i < myText.Length - 2; i++)
+            {
+                // czy wewnątrz jakiegoś palindroma
+                if (i < right)
+                    R[0, i] = Math.Min(right - i, R[0, left + (right - i)]);
+                
+                // rozszerzanie
+                while (myText[i - R[0, i]] == myText[i + R[0, i] + 1])
+                    R[0, i]++;
+
+                // powiększony z prawej, albo nowy palindrom
+                if (i + R[0, i] > right)
+                {
+                    left = i - R[0, i];
+                    right = i + R[0, i];
+                }
+
+                if (R[0, i] > 0)
+                    result.Add(((i - R[0, i]), 2 * R[0, i]));
+            }
             
-            foreach (char c in text)
-                myText += c + "#";
-
-            // string myText = "##" + String.Join("#", text.ToArray()) + "#$";
-            myText = "#" + myText + "$";
-
-            int[] R = new int[myText.Length];
-            int left = 2;
-            int right = 2;
+            left = 2;
+            right = 2;
+            // nieparzyste
             for (int i = 2; i < myText.Length - 2; i++)
             {
                 // czy wewnątrz jakiegoś palindroma
                 if (i < right)
-                    R[i] = Math.Min(right - i, R[left + (right - i)]);
+                    R[1, i] = Math.Min(right - i, R[1, left + (right - i)]);
                 
                 // rozszerzanie
-                while (myText[i - R[i] - 1] == myText[i + R[i] + 1])
-                    R[i]++;
-
+                while (myText[i - R[1, i] - 1] == myText[i + R[1, i] + 1])
+                    R[1, i]++;
+            
                 // powiększony z prawej, albo nowy palindrom
-                if (i + R[i] > right)
+                if (i + R[1, i] > right)
                 {
-                    left = i - R[i];
-                    right = i + R[i];
+                    left = i - R[1, i];
+                    right = i + R[1, i];
                 }
-
-                // int d = R[i]; // (2 * R[i] + 1) / 2;
-                if (R[i] > 1)
-                    result.Add(((i - R[i] - 1) / 2, R[i]));
+            
+                if (R[1, i] > 0)
+                    result.Add(((i - R[1, i] - 1), 2 * R[1, i] + 1));
             }
             
             return result.ToArray();
