@@ -23,55 +23,46 @@ namespace Labratoria_ASD2_2024
         public (int startIndex, int length)[] FindPalindromes(string text)
         {
             var result = new List<(int, int)>();
+            
+            // wykorzystamy wartowników
             string myText = "#" + text + "$";
+            
+            // R[0,...] promienie parzystych, R[1,...] nieparzystych
             int[,] R = new int[2, myText.Length];
-
-            int left = 1;
-            int right = 1;
-            // parzyste
-            for (int i = 1; i < myText.Length - 2; i++)
+            
+            // k = 0 -> palindromy parzyste,
+            // k = 1 -> palindromy nieparzyste
+            for (int k = 0; k < 2; k++)
             {
-                // czy wewnątrz jakiegoś palindroma
-                if (i < right)
-                    R[0, i] = Math.Min(right - i, R[0, left + (right - i)]);
-                
-                // rozszerzanie
-                while (myText[i - R[0, i]] == myText[i + R[0, i] + 1])
-                    R[0, i]++;
-
-                // powiększony z prawej, albo nowy palindrom
-                if (i + R[0, i] > right)
+                int left = 1; 
+                int right = 1; // prawy koniec palindromu
+                for (int i = 2; i < myText.Length - 1; i++) // zaczniemy od razu od 2, żeby promień co najmniej 1
                 {
-                    left = i - R[0, i];
-                    right = i + R[0, i];
-                }
+                    // Czy wewnątrz jakiegoś palindromu,
+                    // clampujemy radius między poprzednim lustrzanym wynikiem, a pozostałą długością w palindromie 
+                    if (i < right)
+                        R[k, i] = Math.Min(right - i, R[k, left + (right - i)]);
+                    
+                    // Standardowe rozszerzanie
+                    // W najgorszym przypadku porównamy jeszcze raz, ale też dajemy możliwość rozszerzenia się
+                    // dla przypadku z Rysunku 4
+                    while (myText[i - R[k, i] - 1] == myText[i + R[k, i] + k])
+                        R[k, i]++;
 
-                if (R[0, i] > 0)
-                    result.Add(((i - R[0, i]), 2 * R[0, i]));
-            }
-            
-            left = 2;
-            right = 2;
-            // nieparzyste
-            for (int i = 2; i < myText.Length - 2; i++)
-            {
-                // czy wewnątrz jakiegoś palindroma
-                if (i < right)
-                    R[1, i] = Math.Min(right - i, R[1, left + (right - i)]);
-                
-                // rozszerzanie
-                while (myText[i - R[1, i] - 1] == myText[i + R[1, i] + 1])
-                    R[1, i]++;
-            
-                // powiększony z prawej, albo nowy palindrom
-                if (i + R[1, i] > right)
-                {
-                    left = i - R[1, i];
-                    right = i + R[1, i];
+                    // Rozszerzony z prawej (Rysunek 4) albo po prostu nowy większy palindrom
+                    if (i + R[k, i] > right)
+                    {
+                        left = i - R[k, i];
+                        right = i + R[k, i];
+                    }
+
+                    if (R[k, i] > 0) // (2 * R[k, i] + 1) / 2 = R[k, i]
+                    {
+                        int pos = i - R[k, i] - 1; // -1 przez wartownika
+                        int len = 2 * R[k, i] + k;
+                        result.Add((pos, len));
+                    }
                 }
-            
-                if (R[1, i] > 0)
-                    result.Add(((i - R[1, i] - 1), 2 * R[1, i] + 1));
             }
             
             return result.ToArray();
