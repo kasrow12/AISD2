@@ -21,14 +21,6 @@ namespace ASD2
             int[] coloring = new int[n];
             int colors = 1;
 
-            bool IsSafe(int v, int c)
-            {
-                foreach (int i in g.OutNeighbors(v))
-                    if (coloring[i] == c)
-                        return false;
-                return true;
-            }
-            
             // int[] vertices = Enumerable.Range(0, n).ToArray();
             // Array.Sort(vertices, (v1, v2) => g.OutNeighbors(vertices[v1]).Count().CompareTo(g.OutNeighbors(vertices[v2]).Count()));
 
@@ -53,16 +45,18 @@ namespace ASD2
             }
 
             bool[,] used = new bool[n, colors + 1];
+            int curr = 0;
             bool ColorGraph(int i)
             {
+                curr++;
                 if (i == -1)
-                    return true;
-                
-                // Consider this vertex v and try different colors
-                for (int c = 1; c <= colors; c++)
                 {
-                    // Check if assignment of color c to v is fine
-                    // if (IsSafe(vertices[i], c))
+                    curr--;
+                    return true;
+                }
+                
+                for (int c = 1; c <= Math.Min(colors, curr); c++)
+                {
                     if (!used[i, c])
                     {
                         List<int> changed = new List<int>();
@@ -79,9 +73,11 @@ namespace ASD2
                             }
                         }
 
-                        // Recur to assign colors to the rest of the vertices
                         if (ColorGraph(FindMin()))
+                        {
+                            curr--;
                             return true;
+                        }
 
                         foreach (int u in changed)
                         {
@@ -93,6 +89,7 @@ namespace ASD2
                     }
                 }
 
+                curr--;
                 return false;
             }
 
@@ -114,7 +111,6 @@ namespace ASD2
                 for (int i = 0; i < n; i++)
                     avail[i] = colors;
 
-                // Console.WriteLine(colors);
                 used = new bool[n, colors + 1];
             }
             
