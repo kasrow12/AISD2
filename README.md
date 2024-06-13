@@ -2,11 +2,9 @@
 
 
 > [!IMPORTANT]
-> Wykorzystane zostały biblioteki:
+> Wykorzystane zostały biblioteki dostarczone przez prowadzących przedmiot:
 > - `Graphs.dll` - reprezentacje grafów oraz podstawowe funkcje i algorytmy,
-> - `TestSet.dll` - jak nazwa wskazuje - wspomagająca testowanie rozwiązań,
->
-> które zostały dostarczone przez prowadzących przedmiot.
+> - `TestSet.dll` - jak nazwa wskazuje - wspomagająca testowanie rozwiązań.
 
 > [!NOTE]
 > Zadania **pogrubione** były punktowanymi laboratoriami. <br>
