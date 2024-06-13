@@ -18,44 +18,48 @@ namespace ASD2
             if (n == 0)
                 return (0, null);
             
+            // Domyślnie zera, czyli brak koloru
             int[] coloring = new int[n];
-            int colors = 1;
+            int maxColors = 1;
 
-            // int[] vertices = Enumerable.Range(0, n).ToArray();
-            // Array.Sort(vertices, (v1, v2) => g.OutNeighbors(vertices[v1]).Count().CompareTo(g.OutNeighbors(vertices[v2]).Count()));
-
-            int[] avail = new int[n];
+            int[] numOfAvailableColors = new int[n];
             for (int i = 0; i < n; i++)
-                avail[i] = colors;
+                numOfAvailableColors[i] = maxColors;
 
+            // Znajduje wierzchołek z najmniejszą liczbą dostępnych kolorów
+            // (nie bierze pod uwagę jednej późniejszej optymalizacji)
             int FindMin()
             {
-                int umin = -1;
-                int availmin = int.MaxValue;
+                int availMinIndex = -1;
+                int availMin = int.MaxValue;
                 for (int i = 0; i < n; i++)
                 {
-                    if (coloring[i] == 0 && avail[i] < availmin)
+                    if (coloring[i] == 0 && numOfAvailableColors[i] < availMin)
                     {
-                        umin = i;
-                        availmin = avail[umin];
+                        availMinIndex = i;
+                        availMin = numOfAvailableColors[availMinIndex];
                     }
                 }
 
-                return umin;
+                return availMinIndex;
             }
 
-            bool[,] used = new bool[n, colors + 1];
-            int curr = 0;
+            // +1, bo kolory indeksujemy od 1 (0 tak jakby nullem)
+            bool[,] used = new bool[n, maxColors + 1];
+            int numOfColoredVertices = 0;
+            
             bool ColorGraph(int i)
             {
-                curr++;
-                if (i == -1)
+                numOfColoredVertices++;
+                if (i == -1) // FindMin zwraca -1, kiedy nie ma dostępnego wierzchołka
                 {
-                    curr--;
+                    numOfColoredVertices--;
                     return true;
                 }
                 
-                for (int c = 1; c <= Math.Min(colors, curr); c++)
+                // Gdy kolorujemy n-ty wierzchołek, możemy go pokolorować na max. n kolory,
+                // albo mniej, jeśli globalne max jest mniejsze - stąd te Math.Min
+                for (int c = 1; c <= Math.Min(maxColors, numOfColoredVertices); c++)
                 {
                     if (!used[i, c])
                     {
@@ -69,27 +73,27 @@ namespace ASD2
                             {
                                 changed.Add(u);
                                 used[u, c] = true;
-                                avail[u]--;
+                                numOfAvailableColors[u]--;
                             }
                         }
 
                         if (ColorGraph(FindMin()))
                         {
-                            curr--;
+                            numOfColoredVertices--;
                             return true;
                         }
 
                         foreach (int u in changed)
                         {
                             used[u, c] = false;
-                            avail[u]++;
+                            numOfAvailableColors[u]++;
                         }
                         used[i, c] = false;
                         coloring[i] = 0;
                     }
                 }
 
-                curr--;
+                numOfColoredVertices--;
                 return false;
             }
 
@@ -105,16 +109,17 @@ namespace ASD2
                 return true;
             }
 
+            // Sprawdzamy możliwe k-kolorowania od 1 wzwyż, dopóki nie pokolorujemy
             while (!ColorAll())
             {
-                colors++;
+                maxColors++;
                 for (int i = 0; i < n; i++)
-                    avail[i] = colors;
+                    numOfAvailableColors[i] = maxColors;
 
-                used = new bool[n, colors + 1];
+                used = new bool[n, maxColors + 1];
             }
             
-            return (colors, coloring);
+            return (maxColors, coloring);
         }
 
     }
