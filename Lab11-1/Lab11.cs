@@ -123,80 +123,73 @@ namespace ASD
             return (above, below);
         }
 
-        List<(double, double)> MergeListInOrder(List<(double, double)> above1, List<(double, double)> above2, bool rev)
+        List<(double, double)> MergeListInOrder(List<(double, double)> list1, List<(double, double)> list2, bool rev)
         {
-            var above = new List<(double, double)>();
+            var list = new List<(double, double)>();
 
             int i = 0;
             int j = 0;
-            while (i < above1.Count && j < above2.Count)
+            while (i < list1.Count && j < list2.Count)
             {
-                if ((!rev && above1[i].Item1 < above2[j].Item1) || (rev && above1[i].Item1 > above2[j].Item1))
+                if ((!rev && list1[i].Item1 < list2[j].Item1) || (rev && list1[i].Item1 > list2[j].Item1))
                 {
-                    above.Add(above1[i]);
-                    i++;
+                    list.Add(list1[i++]);
                 }
-                else if ((!rev && above1[i].Item1 > above2[j].Item1) || (rev && above1[i].Item1 < above2[j].Item1))
+                else if ((!rev && list1[i].Item1 > list2[j].Item1) || (rev && list1[i].Item1 < list2[j].Item1))
                 {
-                    // above.Add(above1[i]);
-                    // i++;
-                    
-                    // if (above1[i].Item2 != above2[j].Item2)
-                        above.Add(above2[j]);
-                    j++;   
+                    list.Add(list2[j++]);
                 }
                 else
                 {
-                    if (above1[i].Item2 > above2[j].Item2)
+                    if (list1[i].Item2 > list2[j].Item2)
                     {
-                        above.Add(above2[j++]);
+                        if (rev)
+                            list.Add(list1[i++]);
+                        else 
+                            list.Add(list2[j++]);
                     }
-                    else if (above1[i].Item2 < above2[j].Item2)
+                    else if (list1[i].Item2 < list2[j].Item2)
                     {
-                        above.Add(above1[i++]);
+                        if (rev)
+                            list.Add(list2[j++]);
+                        else 
+                            list.Add(list1[i++]);
                     }
                     else
                     {
-                        j++;
+                        i++;
                     }
-                    
                 }
-                // else
-                // {
-                //     if (above1[i].Item2 == above2[j].Item2)
-                //     {
-                //         above.Add(above1[i]);
-                //     }
-                //     else if (above1[i].Item2 < above2[j].Item2)
-                //     {
-                //         above.Add(above2[j]);
-                //     }
-                //     else
-                //     {
-                //         above.Add(above1[i]);
-                //     }
-                //     i++;
-                //     j++;
-                // }
-                // else// if (above1[i].Item1 > above2[j].Item1)
-                // {
-                //     above.Add(above2[j]);
-                //     j++;   
-                // }
             }
 
-            while (i < above1.Count)
+            while (i < list1.Count)
+                list.Add(list1[i++]);
+            
+            while (j < list2.Count)
+                list.Add(list2[j++]);
+
+            return list;
+        }
+        
+        Stack<(double, double)> Grahamize(List<(double, double)> points)
+        {
+            var stack = new Stack<(double, double)>();
+            stack.Push(points[0]);
+            stack.Push(points[1]);
+            
+            for (int i = 2; i < points.Count; i++)
             {
-                above.Add(above1[i]);
-                i++;
-            }
-            while (j < above2.Count)
-            {
-                above.Add(above2[j]);
-                j++;
+                var p = stack.Pop();
+                var next = points[i];
+            
+                while (stack.Count > 0 && Cross(stack.Peek(), p, next) <= 0)
+                    p = stack.Pop();
+                
+                stack.Push(p);
+                stack.Push(next);
             }
 
-            return above;
+            return stack;
         }
 
         // Etap 2
@@ -206,100 +199,27 @@ namespace ASD
             (int min1, int max1) = FindMinMaxX(poly1);
             (int min2, int max2) = FindMinMaxX(poly2);
             
-            // Console.WriteLine($"{min1} {max1} {min2} {max2}");
-
             var (above1, below1) = SplitConvexHull(poly1, min1, max1);
             var (above2, below2) = SplitConvexHull(poly2, min2, max2);
-
-            // if (above1.Count + below1.Count != poly1.Length
-            //     || above2.Count + below2.Count != poly2.Length)
-            //     throw new Exception();
 
             var above = MergeListInOrder(above1, above2, true);
             var below = MergeListInOrder(below1, below2, false);
 
-            // var aboveCH = ConvexHull(above.ToArray());
-            // var belowCH = ConvexHull(below.ToArray());
-            
-            
-            var stack = new Stack<(double, double)>();
-            stack.Push(above[0]);
-            stack.Push(above[1]);
-            
-            for (int i = 2; i < above.Count; i++)
-            {
-                var p = stack.Pop();
-                var next = above[i];
-            
-                while (stack.Count > 0 && Cross(stack.Peek(), p, next) <= 0)
-                {
-                    p = stack.Pop();
-                }
-                
-                stack.Push(p);
-                stack.Push(next);
-            }
-            var aboveCH = stack.ToArray();
-            // Console.WriteLine(String.Join('|', stack.ToArray()));
-            
-            stack = new Stack<(double, double)>();
-            stack.Push(below[0]);
-            stack.Push(below[1]);
-            
-            for (int i = 2; i < below.Count; i++)
-            {
-                var p = stack.Pop();
-                var next = below[i];
-            
-                while (stack.Count > 0 && Cross(stack.Peek(), p, next) <= 0)
-                {
-                    p = stack.Pop();
-                }
-                
-                stack.Push(p);
-                stack.Push(next);
-            }
+            var hull = new List<(double, double)>();
 
-            var belowCH = stack.ToArray();
-            // Console.WriteLine(String.Join('|', stack.ToArray()));
-
-            var res = new (double, double)[aboveCH.Length + belowCH.Length];
-            belowCH.CopyTo(res, 0);
-            aboveCH.CopyTo(res, belowCH.Length);
-
-            // var xd = new (double, double)[poly1.Length + poly2.Length];
-            // poly1.CopyTo(xd, 0);
-            // poly2.CopyTo(xd, poly1.Length);
-            // var xd2 = ConvexHull(res);
-            var list = new List<(double, double)>();
-            foreach (var p in belowCH)
-                list.Insert(0,p);
+            foreach (var p in Grahamize(below))
+                hull.Add(p);
             
-            if (belowCH[^1] != aboveCH[0])
-                list.Insert(0,aboveCH[0]);
-
+            var aboveCH = Grahamize(above).ToArray();
+            // Skip zerowego i ostatniego elementu, bo duplikaty odpowiednio min i maxa
             for (int i = 1; i < aboveCH.Length - 1; i++)
-                list.Insert(0,aboveCH[i]);
+                hull.Add(aboveCH[i]);
 
-            // Console.WriteLine(String.Join('|', res.ToArray()));
-            Console.WriteLine(String.Join('|', list));
-            // Console.WriteLine(String.Join('|', xd2));
-            return list.ToArray();
-
-            return res;
-            // i = 1;
-            // while (i < above.Count)
-            // {
-            //     if (above[i - 1].Item1 < above[i].Item1)
-            //         throw new Exception();
-            //     
-            //     i++;
-            // }
+            var result = hull.ToArray();
+            // Stack odwraca kolejność 
+            Array.Reverse(result);
             
-            
-            
-            return null;
+            return result;
         }
-
     }
 }

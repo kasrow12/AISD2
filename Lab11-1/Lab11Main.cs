@@ -177,8 +177,8 @@ namespace ASD
                 new (double, double)[] { (1, 3), (3, 2), (4, 2), (3, 3) },
                 new (double, double)[] { (0, 0), (1, 0), (4, 2), (3, 3), (1, 3), (0, 1) }));
             convexHullTwoTests.TestCases.Add(new ConvexHullTwoTestCase(TIME_MULTIPLIER, null, "Disjoint2",
-                new (double, double)[] { (3, 1), (2, 1), (1, 2), (2, 3), (3, 3), (4, 2) },
-                new (double, double)[] { (6, 2), (5, 3), (5, 4), (6, 5), (7, 4), (7, 3) },
+                new (double, double)[] { (3, 1), (4, 2), (3, 2), (2, 3), (1, 2), (2, 1) },
+                new (double, double)[] { (6, 2), (7, 3), (7, 4), (6, 5), (5, 4), (5, 3) },
                 new (double, double)[] { (6, 2), (7, 3), (7, 4), (6, 5), (2, 3), (1, 2), (2, 1), (3, 1) }));
             convexHullTwoTests.TestCases.Add(new ConvexHullTwoTestCase(TIME_MULTIPLIER, null, "Common top point",
                 new (double, double)[] { (2, 0), (1, 1), (0, 0) },
@@ -204,6 +204,10 @@ namespace ASD
                 new (double, double)[] { (2, 2), (4, 2), (4, 4), (2, 4) },
                 new (double, double)[] { (2, 4), (3, 5), (2, 6) },
                 new (double, double)[] { (2, 2), (4, 2), (4, 4), (2, 6) }));
+            convexHullTwoTests.TestCases.Add(new ConvexHullTwoTestCase(TIME_MULTIPLIER, null, "Extended vertical edge2",
+                new (double, double)[] { (2, 2), (4, 2), (4, 4), (2, 4) },
+                new (double, double)[] { (2, 0), (3, 1), (2, 2) },
+                new (double, double)[] { (2, 0), (4, 2), (4, 4), (2, 4) }));
             convexHullTwoTests.TestCases.Add(new ConvexHullTwoTestCase(TIME_MULTIPLIER, null, "Common horizontal edge",
                 new (double, double)[] { (2.5, -1), (3, 0), (2, 0) },
                 new (double, double)[] { (2, 0), (3, 0), (3, 1), (2, 1) },
@@ -212,6 +216,14 @@ namespace ASD
                 new (double, double)[] { (0, 0), (1, 0), (1, 1), (0, 1) },
                 new (double, double)[] { (0, 0), (0, 1), (-1, 0.5) },
                 new (double, double)[] { (0, 0), (1, 0), (1, 1), (0, 1), (-1, 0.5) }));
+            convexHullTwoTests.TestCases.Add(new ConvexHullTwoTestCase(TIME_MULTIPLIER, null, "My common edges",
+                new (double, double)[] { (3, 0), (2, 1), (0, 1), (0, 0) },
+                new (double, double)[] { (1, 1), (2, 1), (3, 0), (4, 1), (2, 3) },
+                new (double, double)[] { (0, 0), (3, 0), (4, 1), (2, 3), (0, 1) }));
+            convexHullTwoTests.TestCases.Add(new ConvexHullTwoTestCase(TIME_MULTIPLIER, null, "My common edge",
+                new (double, double)[] { (3, 0), (2, 1), (0, 1), (0, 0) },
+                new (double, double)[] { (2, 1), (3, 0), (4, 1), (2, 3) },
+                new (double, double)[] { (0, 0), (3, 0), (4, 1), (2, 3), (0, 1) }));
 
             return convexHullTwoTests;
         }
