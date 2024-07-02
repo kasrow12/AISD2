@@ -19,7 +19,7 @@
 | ✔ | [**Lab02**](../master/Lab02/) | **Programowanie dynamiczne** | **Ruchy na planszy** | |
 | ✔ | [Lab03-1](../master/Lab03-1/) | Grafy | Kruskal, dwudzielność | |
 | ✔ | [Lab03-2](../master/Lab03-2/) | Grafy | Krawędziowy, kolorowanie | |
-| ✔ | [Lab04-2023](../master/Lab04-2023/) | Grafy | Zmiany grup | zastąpić słowniki |
+| ✔ | [Lab04-2023](../master/Lab04-2023/) | Grafy | Zmiany grup | |
 | ✔ | [**Lab04**](../master/Lab04/) | **Grafy** | **Podróż pociąiem** |  | 
 | ✔ | [Lab05-1](../master/Lab05-1/) | Najkrótsze ścieżki | Labirynt | |
 | ➕ | [Lab05-2](../master/Lab05-2/) | Najkrótsze ścieżki | Szerokie ścieżki | brak 2. etapu |
