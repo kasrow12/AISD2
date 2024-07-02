@@ -29,7 +29,7 @@
 | ✖ | Lab07-2 | Przepływy | Przekroje | |
 | ✔ | [**Lab08**](../master/Lab08/) | **Przepływy** | **Dom dla gekona** | |
 | ✔ | [Lab09-1](../master/Lab09-1/) | Algorytmy wykładnicze | Klika, izomorfizm | |
-| ➕ | [Lab09-2](../master/Lab09-2/) | Algorytmy wykładnicze | Odwiedzanie miast | brak 2. etapu |
+| ✔ | [Lab09-2](../master/Lab09-2/) | Algorytmy wykładnicze | Odwiedzanie miast | |
 | ✔ | [Lab10-2022](../master/Lab10-2022/) | Algorytmy wykładnicze | Parowóz z jajkami | |
 | ✔ | [**Lab10**](../master/Lab10/) | **Algorytmy wykładnicze** | **Labirynt z przedmiotami** | | 
 | ✔ | [Lab11-1](../master/Lab11-1/) | Geometria | Otoczka wypukła | |
