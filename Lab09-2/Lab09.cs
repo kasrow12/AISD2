@@ -42,34 +42,32 @@ public class Lab08 : MarshalByRefObject
         double[] meetingCosts, double budget, int capitalCity, out (int, bool)[] path)
     {
         int n = cities.VertexCount;
-        List<(int, bool)> S = [(capitalCity, true)];
-        int curSum = citiesPopulation[capitalCity];
-        double curCost = meetingCosts[capitalCity];
-        List<(int, bool)> bestS = [(capitalCity, true)];
-        int bestSum = citiesPopulation[capitalCity];
-        double bestCost = meetingCosts[capitalCity];
-        if (meetingCosts[capitalCity] > budget)
-        {
-            bestS = [(capitalCity, false)];
-            bestSum = 0;
-            bestCost = 0;
-        }
+        List<(int, bool)> S = [];
+        List<(int, bool)> bestS = [(capitalCity, false)]; // baza
+        int curSum = 0;
+        int bestSum = 0;
+        double curCost = 0;
+        double bestCost = 0;
 
         bool[] used = new bool[n];
-        bool after = false;
+        bool afterCapital = false;
 
         void MaxCampaign(int last, bool organize)
         {
-            // Console.WriteLine(String.Join(',', S));
-            if (capitalCity != last)
+            // Nie dodawaj miasta startowego drugi raz na końcu
+            if (!used[last])
             {
                 S.Add((last, organize));
-                used[last] = true;
                 if (organize)
+                {
                     curSum += citiesPopulation[last];
+                    curCost += meetingCosts[last];
+                }
+
+                used[last] = true;
             }
-            
-            if (after && capitalCity == last)
+
+            if (capitalCity == last)
             {
                 if (curSum > bestSum
                     || (curSum == bestSum && curCost < bestCost))
@@ -79,58 +77,52 @@ public class Lab08 : MarshalByRefObject
                     bestSum = curSum;
                 }
 
-                return;
+                if (afterCapital)
+                    return;
+
+                afterCapital = true;
             }
-            
-            if (capitalCity == last)
-                after = true;
 
             foreach (var e in cities.OutEdges(last))
             {
-                if (used[e.To] || curCost + e.Weight > budget)
+                // Do stolicy musimy wejść drugi raz
+                if ((used[e.To] && e.To != capitalCity) || curCost + e.Weight > budget)
                     continue;
 
                 curCost += e.Weight;
+
                 if (curCost + meetingCosts[e.To] <= budget)
-                {
-                    curCost += meetingCosts[e.To];
                     MaxCampaign(e.To, true);
-                    curCost -= meetingCosts[e.To];
-                }
-                
+
                 if (meetingCosts[e.To] > 0)
                     MaxCampaign(e.To, false);
-                
+
                 curCost -= e.Weight;
             }
 
-            if (capitalCity != last)
+            if (organize && used[last])
             {
-                used[last] = false;
-                if (organize)
-                    curSum -= citiesPopulation[last];
-                S.RemoveAt(S.Count - 1); // remove last
+                curSum -= citiesPopulation[last];
+                curCost -= meetingCosts[last];
             }
+
+            used[last] = false;
+            S.RemoveAt(S.Count - 1); // remove last
         }
 
+        // Organizuj w stolicy
         if (meetingCosts[capitalCity] <= budget)
-        {
             MaxCampaign(capitalCity, true);
-        }
 
+        // Nie organizuj w stolicy, jeśli koszt jest niezerowy (wpp. zorganizowano wyżej)
         if (meetingCosts[capitalCity] > 0)
         {
-            after = false;
-            used = new bool[n];
-            S = [(capitalCity, false)];
-            curSum = 0;
-            curCost = 0;
+            afterCapital = false;
+            // used, S, curSum i curCost raczej się resetują
             MaxCampaign(capitalCity, false);
         }
 
         path = bestS.ToArray();
-        // Console.WriteLine(String.Join(',', bestS));
-
         return bestSum;
     }
 }
