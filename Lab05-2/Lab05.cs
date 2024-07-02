@@ -57,29 +57,33 @@ public class Lab06 : MarshalByRefObject
         
         // Console.WriteLine(String.Join(',', set));
 
-        int res = int.MaxValue;
+        int res = 0;
         var list = new List<int>();
 
         foreach (int k in set)
         {
             int[] from = new int[g.VertexCount];
             int[] waitTimes = new int[g.VertexCount];
+            int[] minWi = new int[g.VertexCount];
             for (int i = 0; i < g.VertexCount; i++)
             {
-                waitTimes[i] = int.MaxValue;
+                waitTimes[i] = 0;
+                minWi[i] = int.MaxValue;
             }
 
+
+            waitTimes[start] = weights[start];
             from[end] = -1;
 
             var q = new PriorityQueue<int, (int, int)>();
-            q.Insert((start, weights[start]), weights[start]);
+            q.Insert((start, weights[start]), 0);
 
             while (q.Count > 0)
             {
                 (int v, int time) = q.Extract();
 
-                if (time > waitTimes[v])
-                    continue;
+                // if (time > waitTimes[v])
+                    // continue;
 
                 foreach (var e in g.OutEdges(v))
                 {
@@ -87,18 +91,19 @@ public class Lab06 : MarshalByRefObject
                         continue;
                     
                     int curr = time + weights[e.To];
-                    if (curr < waitTimes[e.To])
+                    if (curr > waitTimes[e.To])
                     {
-                        q.Insert((e.To, curr), curr);
+                        q.Insert((e.To, curr), -curr);
                         from[e.To] = v;
                         waitTimes[e.To] = curr;
+                        minWi[e.To] = Math.Min(e.Weight, minWi[e.To]);
                     }
                 }
             }
 
-            if (from[end] > -1 && waitTimes[end] - k < res)
+            if (from[end] > -1 && Math.Abs(waitTimes[end] - minWi[end]) > Math.Abs(res))
             {
-                res = waitTimes[end] - k;
+                res = minWi[end] - waitTimes[end];
                 
                 list = new List<int> { end };
                 int u = end;
