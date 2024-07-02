@@ -43,17 +43,33 @@ public class Lab08 : MarshalByRefObject
     {
         int n = cities.VertexCount;
         List<(int, bool)> S = [(capitalCity, true)];
-        int curSum = 0;
-        int curCost = 0;
-        List<(int, bool)> bestS = [(capitalCity, true), (capitalCity, true)];
+        int curSum = citiesPopulation[capitalCity];
+        double curCost = meetingCosts[capitalCity];
+        List<(int, bool)> bestS = [(capitalCity, true)];
         int bestSum = citiesPopulation[capitalCity];
-        int bestCost = 0;
+        double bestCost = meetingCosts[capitalCity];
+        if (meetingCosts[capitalCity] > budget)
+        {
+            bestS = [(capitalCity, false)];
+            bestSum = 0;
+            bestCost = 0;
+        }
 
         bool[] used = new bool[n];
+        bool after = false;
 
-        void MaxCampaign(int last)
+        void MaxCampaign(int last, bool organize)
         {
-            if (used[capitalCity] && capitalCity == last)
+            // Console.WriteLine(String.Join(',', S));
+            if (capitalCity != last)
+            {
+                S.Add((last, organize));
+                used[last] = true;
+                if (organize)
+                    curSum += citiesPopulation[last];
+            }
+            
+            if (after && capitalCity == last)
             {
                 if (curSum > bestSum
                     || (curSum == bestSum && curCost < bestCost))
@@ -62,33 +78,59 @@ public class Lab08 : MarshalByRefObject
                     bestCost = curCost;
                     bestSum = curSum;
                 }
-                else
-                {
-                    return;
-                }
+
+                return;
             }
+            
+            if (capitalCity == last)
+                after = true;
 
             foreach (var e in cities.OutEdges(last))
             {
                 if (used[e.To] || curCost + e.Weight > budget)
                     continue;
 
-                S.Add((e.To, true));
-                curSum += citiesPopulation[e.To];
                 curCost += e.Weight;
-                used[e.To] = true;
-                MaxCampaign(e.To);
-                used[e.To] = false;
-                curSum -= citiesPopulation[e.To];
+                if (curCost + meetingCosts[e.To] <= budget)
+                {
+                    curCost += meetingCosts[e.To];
+                    MaxCampaign(e.To, true);
+                    curCost -= meetingCosts[e.To];
+                }
+                
+                if (meetingCosts[e.To] > 0)
+                    MaxCampaign(e.To, false);
+                
                 curCost -= e.Weight;
-                S.RemoveAt(S.Count - 1); // remove last                
+            }
+
+            if (capitalCity != last)
+            {
+                used[last] = false;
+                if (organize)
+                    curSum -= citiesPopulation[last];
+                S.RemoveAt(S.Count - 1); // remove last
             }
         }
 
-        MaxCampaign(capitalCity);
+        if (meetingCosts[capitalCity] <= budget)
+        {
+            MaxCampaign(capitalCity, true);
+        }
 
-        bestS.RemoveAt(bestS.Count - 1);
+        if (meetingCosts[capitalCity] > 0)
+        {
+            after = false;
+            used = new bool[n];
+            S = [(capitalCity, false)];
+            curSum = 0;
+            curCost = 0;
+            MaxCampaign(capitalCity, false);
+        }
+
         path = bestS.ToArray();
+        // Console.WriteLine(String.Join(',', bestS));
+
         return bestSum;
     }
 }
