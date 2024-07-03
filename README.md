@@ -26,7 +26,7 @@
 | ➕ | [Lab06-2022](../master/Lab06-2022/) | Najkrótsze ścieżki | Żabka | 3,4 etap? |
 | ✔ | [**Lab06**](../master/Lab06/) | **Najkrótsze ścieżki** | **Ścieżka kameleona** | | 
 | ✖ | Lab07-1 | Przepływy | Planowanie produkcji | |
-| ✖ | Lab07-2 | Przepływy | Przekroje | |
+| ✔ | [Lab07-2](../master/Lab07-2/) | Przepływy | Przekroje | |
 | ✔ | [**Lab08**](../master/Lab08/) | **Przepływy** | **Dom dla gekona** | |
 | ✔ | [Lab09-1](../master/Lab09-1/) | Algorytmy wykładnicze | Klika, izomorfizm | |
 | ✔ | [Lab09-2](../master/Lab09-2/) | Algorytmy wykładnicze | Odwiedzanie miast | |
