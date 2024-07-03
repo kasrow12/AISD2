@@ -15,7 +15,7 @@
 | :---: | :---: | :---: | :---: | :---: |
 | ✔ | [Lab01-1](../master/Lab01-1/) | Programowanie dynamiczne | Wydawanie reszty | |
 | ✖ | [Lab01-2](../master/Lab01-2/) | Programowanie dynamiczne | Skreślanie | |
-| ➕ | [Lab02-2023](../master/Lab02-2023/) | Programowanie dynamiczne | Robot na planszy | brak 2. etapu |
+| ✔ | [Lab02-2023](../master/Lab02-2023/) | Programowanie dynamiczne | Robot na planszy | |
 | ✔ | [**Lab02**](../master/Lab02/) | **Programowanie dynamiczne** | **Ruchy na planszy** | |
 | ✔ | [Lab03-1](../master/Lab03-1/) | Grafy | Kruskal, dwudzielność | |
 | ✔ | [Lab03-2](../master/Lab03-2/) | Grafy | Krawędziowy, kolorowanie | |

@@ -17,16 +17,17 @@ public class PatternMatching : MarshalByRefObject
     /// </returns>
     public (bool result, string path) Lab02Stage1(int n, int m, (int, int)[] obstacles)
     {
-        var T = new char[n, m];
-        T[n - 1, m - 1] = 'O';
+        int i = n - 1;
+        int j = m - 1;
 
-        var i = n - 1;
-        var j = m - 1;
-        var starting_bot = j;
+        char[,] T = new char[n, m];
+        T[i, j] = 'O';
+
+        int startingColumn = j;
         while (true)
         {
             // Console.WriteLine($"{i}, {j}");
-            if (obstacles.Contains((i, j)))
+            if (obstacles.Contains((i, j))) // można by było zapisać w tablicy i odczyt O(1)
                 T[i, j] = 'X';
             else if (i + 1 < n && T[i + 1, j] != 'X')
                 T[i, j] = 'D';
@@ -41,15 +42,15 @@ public class PatternMatching : MarshalByRefObject
             if (j == m - 1 || i == 0)
             {
                 // j = m - (n - i) - 1;
-                j = --starting_bot;
-                i = n - 1;
+                j = --startingColumn;
+                i = n - 1; // last row
                 if (j < 0)
                 {
-                    i -= 0 - j;
+                    i += j; // i -= -j;
                     j = 0;
                 }
             }
-            else
+            else // idziemy w prawy górny
             {
                 i--;
                 j++;
@@ -88,6 +89,83 @@ public class PatternMatching : MarshalByRefObject
     /// </returns>
     public (bool result, string path) Lab02Stage2(int n, int m, string pattern, (int, int)[] obstacles)
     {
-        return (false, "");
+        // robot musi realizować cały wzorzec, jedynie gwiazdka może być 0 ruchów
+        if (n == 1 && m == 1)
+            return (pattern[0] == '*', "");
+
+        int k = pattern.Length;
+        // inicjalizowana zerami => brak trasy
+        char[,,] T = new char[n, m, k + 1];
+        T[0, 0, 0] = 'O';
+
+        int i, j;
+        // idziemy od lewego górnego, wierszami od lewej do prawej, bo można się poruszać tylko prawo/dół
+        for (i = 0; i < n; i++)
+        {
+            for (j = 0; j < m; j++)
+            {
+                if (obstacles.Contains((i, j))) // można zrobić w macierzy, dla złożoności
+                    continue;
+
+                // spróbujemy użyć l-tego znaku we wzorcu
+                for (int l = 1; l <= k; l++)
+                {
+                    // nie dostaliśmy się (l-1)-szym
+                    if (T[i, j, l - 1] == 0)
+                        continue;
+
+                    if (i + 1 < n && (pattern[l - 1] == 'D' || pattern[l - 1] == '?'))
+                        T[i + 1, j, l] = 'D';
+
+                    if (i + 1 < n && pattern[l - 1] == '*')
+                    {
+                        T[i + 1, j, l] = 'D'; // ala ostatnie wykorzystanie gwiazdki
+                        T[i + 1, j, l - 1] =
+                            'd'; // udajemy, że dostaliśmy się (l-1)-szym, a tak naprawdę poprzednim użyciem gwiazdki
+                    }
+
+                    if (j + 1 < m && (pattern[l - 1] == 'R' || pattern[l - 1] == '?'))
+                        T[i, j + 1, l] = 'R';
+
+                    if (j + 1 < m && pattern[l - 1] == '*')
+                    {
+                        T[i, j + 1, l] = 'R';
+                        T[i, j + 1, l - 1] = 'r';
+                    }
+                }
+            }
+        }
+
+        if (T[n - 1, m - 1, k] == 0)
+            return (false, "");
+
+        var sb = new StringBuilder("");
+        i = n - 1;
+        j = m - 1;
+        while (i != 0 || j != 0)
+        {
+            sb.Insert(0, char.ToUpper(T[i, j, k]));
+
+            if (T[i, j, k] == 'D')
+            {
+                i--;
+                k--;
+            }
+            else if (T[i, j, k] == 'd')
+            {
+                i--;
+            }
+            else if (T[i, j, k] == 'R')
+            {
+                j--;
+                k--;
+            }
+            else if (T[i, j, k] == 'r')
+            {
+                j--;
+            }
+        }
+
+        return (true, sb.ToString());
     }
 }
