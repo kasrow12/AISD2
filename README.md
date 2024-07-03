@@ -22,7 +22,7 @@
 | ✔ | [Lab04-2023](../master/Lab04-2023/) | Grafy | Zmiany grup | |
 | ✔ | [**Lab04**](../master/Lab04/) | **Grafy** | **Podróż pociąiem** |  | 
 | ✔ | [Lab05-1](../master/Lab05-1/) | Najkrótsze ścieżki | Labirynt | |
-| ➕ | [Lab05-2](../master/Lab05-2/) | Najkrótsze ścieżki | Szerokie ścieżki | brak 2. etapu |
+| ✔ | [Lab05-2](../master/Lab05-2/) | Najkrótsze ścieżki | Szerokie ścieżki | |
 | ➕ | [Lab06-2022](../master/Lab06-2022/) | Najkrótsze ścieżki | Żabka | 3,4 etap? |
 | ✔ | [**Lab06**](../master/Lab06/) | **Najkrótsze ścieżki** | **Ścieżka kameleona** | | 
 | ✖ | Lab07-1 | Przepływy | Planowanie produkcji | |
