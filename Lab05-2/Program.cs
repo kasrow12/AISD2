@@ -630,7 +630,7 @@ internal class Lab06TestModule : TestModule
                 4,
                 weights,
                 20,
-                0, // tutaj na pewno 0?
+                0,
                 2,
                 "Rozdział po złączeniu wersja 1"));
         }
