@@ -36,5 +36,6 @@
 | ✔ | [Lab11-2](../master/Lab11-2/) | Geometria | Pole prostokątów | |
 | ✔ | [**Lab12**](../master/Lab12/) | **Geometria** | **Głębokość wody** | |
 | ✔ | [Lab13-1](../master/Lab13-1/) | Algorytmy tekstowe | Potęgi słów | |
+| ➕ | [Lab13-2](../master/Lab13-2/) | Algorytmy tekstowe | Kompresja LZ77 | brak kodowania |
 | ✔ | [**Lab14**](../master/Lab14/) | **Algorytmy tekstowe** | **Wszystkie palindromy** | |
 | ✔ | [**Lab15**](../master/Lab15/) | **Zadanie dowolne** | **Kolorowanie grafów** | |
