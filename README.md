@@ -33,6 +33,7 @@
 | ✔ | [Lab10-2022](../master/Lab10-2022/) | Algorytmy wykładnicze | Parowóz z jajkami | |
 | ✔ | [**Lab10**](../master/Lab10/) | **Algorytmy wykładnicze** | **Labirynt z przedmiotami** | | 
 | ✔ | [Lab11-1](../master/Lab11-1/) | Geometria | Otoczka wypukła | |
+| ✔ | [Lab11-2](../master/Lab11-2/) | Geometria | Pole prostokątów | |
 | ✔ | [**Lab12**](../master/Lab12/) | **Geometria** | **Głębokość wody** | |
 | ✔ | [Lab13-1](../master/Lab13-1/) | Algorytmy tekstowe | Potęgi słów | |
 | ✔ | [**Lab14**](../master/Lab14/) | **Algorytmy tekstowe** | **Wszystkie palindromy** | |
