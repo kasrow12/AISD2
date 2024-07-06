@@ -61,52 +61,45 @@ public class Lab06 : MarshalByRefObject
         foreach (int k in set)
         {
             int[] from = new int[g.VertexCount];
-            int[] waitTimeSum = new int[g.VertexCount];
-            int[] minPathWidth = new int[g.VertexCount];
+            int[] diffs = new int[g.VertexCount];
             for (int i = 0; i < g.VertexCount; i++)
-            {
-                // waitTimes[i] = int.MaxValue + int.MinValue;
-                // minWi[i] = int.MaxValue;
-                waitTimeSum[i] = 0;
-                minPathWidth[i] = int.MinValue;
-            }
+                diffs[i] = int.MinValue;
 
-            waitTimeSum[start] = weights[start];
             from[end] = -1;
+            diffs[start] = weights[start];
 
             var q = new PriorityQueue<int, (int, int, int)>();
-            q.Insert((start, weights[start], int.MaxValue), 0);
+            q.Insert((start, int.MaxValue, weights[start]), 0);
 
             while (q.Count > 0)
             {
-                (int v, int time, int width) = q.Extract();
+                (int v, int width, int time) = q.Extract();
 
-                // if (width > minWi[v] || time > waitTimes[v])
-                    // continue;
+                if (width - time < diffs[v])
+                    continue;
 
                 foreach (var e in g.OutEdges(v))
                 {
                     if (e.Weight > k)
                         continue;
 
-                    int currWaitSum = time + weights[e.To];
-                    int currMinWidth = Math.Min(e.Weight, width);
+                    int wait = time + weights[e.To];
+                    int minWidth = Math.Min(e.Weight, width);
+                    int diff = minWidth - wait;
 
-                    if (currMinWidth - currWaitSum > minPathWidth[e.To] - waitTimeSum[e.To])
+                    if (diff > diffs[e.To])
                     {
-                        q.Insert((e.To, currWaitSum, currMinWidth), currWaitSum - currMinWidth); // -(currWidth - curr) bo kolejka min
+                        q.Insert((e.To, minWidth, wait), -diff); // - bo kolejka min
                         from[e.To] = v;
-                        waitTimeSum[e.To] = currWaitSum;
-                        minPathWidth[e.To] = currMinWidth;
+                        diffs[e.To] = diff;
                     }
                 }
             }
 
-            if (from[end] > -1 && minPathWidth[end] - waitTimeSum[end] > res)
+            if (from[end] > -1 && diffs[end] > res)
             {
-                res = minPathWidth[end] - waitTimeSum[end];
-
-                list = new List<int> { end };
+                res = diffs[end];
+                list = [end];
                 int u = end;
                 while (u != start)
                 {
