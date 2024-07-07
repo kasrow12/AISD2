@@ -10,7 +10,7 @@
 
     <ItemGroup>
       <Reference Include="TestSet">
-        <HintPath>..\..\..\Downloads\TestSet.dll</HintPath>
+        <HintPath>..\TestSet.dll</HintPath>
       </Reference>
     </ItemGroup>
 
