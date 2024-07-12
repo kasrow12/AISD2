@@ -2,13 +2,18 @@
 
 
 > [!IMPORTANT]
-> Wykorzystane zostały biblioteki dostarczone przez prowadzących przedmiot:
-> - `Graphs.dll` - reprezentacje grafów oraz podstawowe funkcje i algorytmy,
-> - `TestSet.dll` - jak nazwa wskazuje - wspomagająca testowanie rozwiązań.
+> Wykorzystano biblioteki dostarczone przez prowadzących przedmiot:
+> - `Graphs.dll` - reprezentacje grafów oraz podstawowe ich funkcje i algorytmy
+> - `TestSet.dll` - wspomagająca testowanie rozwiązań
+>
+> oraz testy poszczególnych zadań w plikach `Program.cs`.
 
 > [!NOTE]
-> Zadania **pogrubione** były punktowanymi laboratoriami. <br>
-> Laboratoria XXX-1, XXX-2 były dwoma zadaniami na laboratoriach uczących.
+> ### Legenda
+> Zadania LabXX-1 oraz LabXX-2 miały charakter uczący. <br>
+> Zadania **pogrubione** były laboratoriami punktowanymi.
+>
+> ✔ - zrobione, ➕ - częściowo (patrz: Uwagi), ✖ - brak rozwiązania
 
 ## Spis treści
 |  | Lab | Kategoria | Zadanie | Uwagi |
